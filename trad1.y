@@ -63,14 +63,22 @@ typedef struct s_attr {
 
 %%
 
-axiom:        sentence ';'                   { printf ("%s\n", $1.code) ; }
-                r_axiom                      { ; }
-            | declaration ';'                { printf ("%s\n", $1.code) ; }
-                r_axiom                      { ; }
+axiom:        global_decls main_def          { printf("%s%s(main)\n", $1.code, $2.code); }
             ;
 
-r_axiom:                                     { ; }
-            | axiom                          { ; }
+global_decls:                               { $$.code = gen_code(""); }
+            | global_decls declaration ';'   { sprintf(temp, "%s%s\n", $1.code, $2.code);
+                                               $$.code = gen_code(temp); }
+            ;
+
+main_def:     MAIN '(' ')' '{' body '}' { sprintf(temp, "(defun main ()\n%s)\n", $5.code);
+                                               $$.code = gen_code(temp); }
+            ;
+
+body:    sentence ';'                   { sprintf(temp, "   %s\n", $1.code);
+                                               $$.code = gen_code(temp); }
+            | body sentence ';'         { sprintf(temp, "%s   %s\n", $1.code, $2.code);
+                                               $$.code = gen_code(temp); }
             ;
 
 declaration:  INTEGER decl_list              { $$ = $2 ; }
