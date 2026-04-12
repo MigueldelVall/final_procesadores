@@ -55,6 +55,8 @@ typedef struct s_attr {
 %token WHILE         // token for keyword while
 %token IF            // token for keyword if
 %token ELSE          // token for keyword else
+%token FOR INC DEC   // tokens for for keywords
+%token SWITCH CASE DEFAULT BREAK // tokens for switch/case keywords
 %token PUTS          // token for keyword puts
 %token PRINTF        // token for keyword printf
 %token AND OR NOT    // tokens for logical operators
@@ -103,12 +105,37 @@ statement:  sentence ';'                { sprintf(temp, "%s", $1.code);
                                           $$.code = gen_code(temp); }
             ;
 
-control_struct: WHILE '(' expression ')' '{' body '}'                  { sprintf (temp, "(loop while %s do %s)", $3.code, $6.code) ;  
-                                                                         $$.code = gen_code (temp) ; }
-                | IF '(' expression ')' '{' body '}'                   { sprintf (temp, "(if %s (progn %s))", $3.code, $6.code) ;  //!ASK ABOUT PROGN!
-                                                                         $$.code = gen_code (temp) ; }
-                | IF '(' expression ')' '{' body '}' ELSE '{' body '}' { sprintf (temp, "(if %s (progn %s) (progn %s))", $3.code, $6.code, $10.code) ;  //!ASK ABOUT PROGN!
-                                                                         $$.code = gen_code (temp) ; }   
+control_struct: WHILE '(' expression ')' '{' body '}'                             { sprintf (temp, "(loop while %s do %s)", $3.code, $6.code) ;  
+                                                                                    $$.code = gen_code (temp) ; }
+                | IF '(' expression ')' '{' body '}'                              { sprintf (temp, "(if %s (progn %s))", $3.code, $6.code) ;  //!ASK ABOUT PROGN!
+                                                                                    $$.code = gen_code (temp) ; }
+                | IF '(' expression ')' '{' body '}' ELSE '{' body '}'            { sprintf (temp, "(if %s (progn %s) (progn %s))", $3.code, $6.code, $10.code) ;  //!ASK ABOUT PROGN!
+                                                                                    $$.code = gen_code (temp) ; } 
+                | FOR '(' for_init ';' expression ';' for_update ')' '{' body '}' { sprintf (temp, "(progn %s (loop while %s do (progn %s %s)))", $3.code, $5.code, $10.code, $7.code) ;
+                                                                                    $$.code = gen_code (temp) ; } 
+                | SWITCH '(' expression ')' '{' case_list '}'                     { sprintf (temp, "(case %s %s)", $3.code, $6.code) ;
+                                                                                    $$.code = gen_code (temp) ; }
+            ;
+
+case_list:  case_list case_block            { sprintf(temp, "%s %s", $1.code, $2.code);
+                                              $$.code = gen_code(temp) ; }
+            | case_block                    { $$.code = $1.code ; }
+            ;
+
+case_block:  CASE NUMBER ':' body BREAK ';'     { sprintf(temp, "(%d (progn %s))", $2.value, $4.code);
+                                                  $$.code = gen_code(temp) ; }
+            | DEFAULT ':' body BREAK ';'        { sprintf(temp, "(otherwise (progn %s))", $3.code);
+                                                  $$.code = gen_code(temp) ; }
+            ;
+
+for_init:  IDENTIF '=' expression           { sprintf (temp, "(setq %s %s)", $1.code, $3.code);
+                                              $$.code = gen_code (temp) ; }
+            ;
+
+for_update:  INC '(' IDENTIF ')'            { sprintf(temp, "(setq %s (+ %s 1))", $3.code, $3.code);
+                                              $$.code = gen_code(temp) ; }
+             | DEC '(' IDENTIF ')'            { sprintf(temp, "(setq %s (- %s 1))", $3.code, $3.code);
+                                              $$.code = gen_code(temp) ; }
             ;
 
 declaration:  INTEGER decl_list              { $$ = $2 ; }
@@ -249,6 +276,13 @@ t_keyword keywords [] = {     // define the keywords
     "while",       WHILE,
     "if",          IF,
     "else",        ELSE,
+    "for",         FOR,
+    "inc",         INC,
+    "dec",         DEC,
+    "switch",      SWITCH,
+    "case",        CASE,
+    "default",     DEFAULT,
+    "break",       BREAK,
     "&&",          AND,
     "||",          OR,
     "!=",          NOT,
