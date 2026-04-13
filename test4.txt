@@ -1,0 +1,7 @@
+int a = 9;
+
+main() {
+    int a = 4;
+    a = a + 1;
+    printf("%d", a);
+}
