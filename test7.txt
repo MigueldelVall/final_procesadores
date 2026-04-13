@@ -1,0 +1,5 @@
+int b[5];
+
+main() {
+    printf("%d", b[0]);
+}

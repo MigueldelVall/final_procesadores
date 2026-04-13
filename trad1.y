@@ -308,13 +308,31 @@ decl_item:
           sprintf(temp, "(setq %s %d)", name, $3.value);
           $$.code = gen_code(temp);
       }
-    ;
+    | IDENTIF '[' NUMBER ']'
+      {
+          char *name;
+          if (strlen(current_function) > 0) {
+              add_local_var($1.code);
+              name = translated_name($1.code);
+          } else {
+              name = gen_code($1.code);
+          }
 
+          sprintf(temp, "(setq %s (make-array %d))", name, $3.value);
+          $$.code = gen_code(temp);
+      }
+    ;
 sentence:
       IDENTIF '=' expression
       {
           char *name = translated_name($1.code);
           sprintf(temp, "(setf %s %s)", name, $3.code);
+          $$.code = gen_code(temp);
+      }
+    | IDENTIF '[' expression ']' '=' expression
+      {
+          char *name = translated_name($1.code);
+          sprintf(temp, "(setf (aref %s %s) %s)", name, $3.code, $6.code);
           $$.code = gen_code(temp);
       }
     | RETURN expression
@@ -328,7 +346,7 @@ sentence:
       }
     | PUTS '(' STRING ')'
       {
-          sprintf(temp, "(print \"%s\")", $3.code);
+          sprintf(temp, "(princ \"%s\")", $3.code);
           $$.code = gen_code(temp);
       }
     | expression
@@ -395,6 +413,12 @@ operand:
           else
               sprintf(temp, "(%s %s)", $1.code, $3.code);
 
+          $$.code = gen_code(temp);
+      }
+    | IDENTIF '[' expression ']'
+      {
+          char *name = translated_name($1.code);
+          sprintf(temp, "(aref %s %s)", name, $3.code);
           $$.code = gen_code(temp);
       }
     | IDENTIF
