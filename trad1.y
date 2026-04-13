@@ -17,17 +17,19 @@ char *my_malloc (int) ;
 char *gen_code (char *) ;
 char *int_to_string (int) ;
 char *char_to_string (char) ;
-char *add_local_var(char *name);
-int is_local_var(char *name);
-char *translated_name(char *name);
 void clear_local_vars();
+void add_scoped_var(char *original, char *translated);
+void add_local_var(char *name);
+void add_param_var(char *name);
+char *translated_name(char *name);
 
 char temp [2048] ;
 
 char current_function[256] = "";
 
 typedef struct s_localvar {
-    char *name;      // original name in C
+    char *original;
+    char *translated;
     struct s_localvar *next;
 } t_localvar;
 
@@ -73,6 +75,7 @@ typedef struct s_attr {
 %token PRINTF        // token for keyword printf
 %token AND OR NOT    // tokens for logical operators
 %token EQ NE LE GE   // tokens for comparison operators (2-char)
+%token RETURN        // token for return statement
 
 
 
@@ -93,8 +96,24 @@ typedef struct s_attr {
 
 %%
 
-axiom:        global_decls main_def          { printf("%s%s(main)\n", $1.code, $2.code); }
-            ;
+axiom:
+      global_decls defs_before_main
+      {
+          printf("%s%s(main)\n", $1.code, $2.code);
+      }
+    ;
+
+defs_before_main:
+      main_def
+      {
+          $$ = $1;
+      }
+    | function_def defs_before_main
+      {
+          sprintf(temp, "%s%s", $1.code, $2.code);
+          $$.code = gen_code(temp);
+      }
+    ;
 
 global_decls:                                { $$.code = gen_code(""); }
             | global_decls declaration ';'   { sprintf(temp, "%s%s\n", $1.code, $2.code);
@@ -113,6 +132,67 @@ main_def:
           $$.code = gen_code(temp);
           clear_local_vars();
           strcpy(current_function, "");
+      }
+    ;
+
+function_def:
+      IDENTIF
+      {
+          strcpy(current_function, $1.code);
+          clear_local_vars();
+      }
+      '(' param_defs ')' '{' body '}'
+      {
+          sprintf(temp, "(defun %s (%s)\n%s)\n", $1.code, $4.code, $7.code);
+          $$.code = gen_code(temp);
+          clear_local_vars();
+          strcpy(current_function, "");
+      }
+    ;
+
+param_defs:
+      {
+          $$.code = gen_code("");
+      }
+    | param_list
+      {
+          $$ = $1;
+      }
+    ;
+
+param_list:
+      INTEGER IDENTIF
+      {
+          add_param_var($2.code);
+          $$.code = gen_code($2.code);
+      }
+    | param_list ',' INTEGER IDENTIF
+      {
+          add_param_var($4.code);
+          sprintf(temp, "%s %s", $1.code, $4.code);
+          $$.code = gen_code(temp);
+      }
+    ;
+
+call_args:
+      {
+          $$.code = gen_code("");
+      }
+    | call_arg_list
+      {
+          $$ = $1;
+      }
+    ;
+
+call_arg_list:
+      expression
+      {
+          $$ = $1;
+      }
+    | call_arg_list ',' expression
+      {
+          sprintf(temp, "%s %s", $1.code, $3.code);
+          $$.code = gen_code(temp);
       }
     ;
 
@@ -237,9 +317,24 @@ sentence:
           sprintf(temp, "(setf %s %s)", name, $3.code);
           $$.code = gen_code(temp);
       }
-    | PRINTF '(' STRING ',' arg_list ')'    { $$.code = $5.code ; }
-    | PUTS '(' STRING ')'                   { sprintf (temp, "(print \"%s\")", $3.code) ;  
-                                              $$.code = gen_code (temp) ; }
+    | RETURN expression
+      {
+          sprintf(temp, "(return-from %s %s)", current_function, $2.code);
+          $$.code = gen_code(temp);
+      }
+    | PRINTF '(' STRING ',' arg_list ')'
+      {
+          $$.code = $5.code;
+      }
+    | PUTS '(' STRING ')'
+      {
+          sprintf(temp, "(print \"%s\")", $3.code);
+          $$.code = gen_code(temp);
+      }
+    | expression
+      {
+          $$ = $1;
+      }
     ;
           
 arg_list:   arg                             {sprintf (temp, "(princ %s)", $1.code) ; 
@@ -270,7 +365,7 @@ expression:   term                           { $$ = $1 ; }
                                                $$.code = gen_code (temp) ; }
             | expression OR expression       { sprintf (temp, "(or %s %s)", $1.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
-            | NOT expression                 { sprintf (temp, "(! %s)", $2.code) ;
+            | NOT expression                 { sprintf (temp, "(not %s)", $2.code) ;
                                                $$.code = gen_code (temp) ; }
             | expression EQ expression       { sprintf (temp, "(= %s %s)", $1.code, $3.code) ;
                                                $$.code = gen_code (temp) ; }
@@ -287,13 +382,22 @@ expression:   term                           { $$ = $1 ; }
             ;
 
 term:         operand                        { $$ = $1 ; }                          
-            | '+' operand %prec UNARY_SIGN   { $$ = $1 ; }
+            | '+' operand %prec UNARY_SIGN   { $$ = $2 ; }
             | '-' operand %prec UNARY_SIGN   { sprintf (temp, "(- %s)", $2.code) ;
                                                $$.code = gen_code (temp) ; }
             ;
 
 operand:
-      IDENTIF
+      IDENTIF '(' call_args ')'
+      {
+          if (strlen($3.code) == 0)
+              sprintf(temp, "(%s)", $1.code);
+          else
+              sprintf(temp, "(%s %s)", $1.code, $3.code);
+
+          $$.code = gen_code(temp);
+      }
+    | IDENTIF
       {
           char *name = translated_name($1.code);
           sprintf(temp, "%s", name);
@@ -379,11 +483,12 @@ t_keyword keywords [] = {     // define the keywords
     "break",       BREAK,
     "&&",          AND,
     "||",          OR,
-    "!=",          NOT,
+    "!",          NOT,
     "==",          EQ,
     "!=",          NE,
     "<=",          LE,
     ">=",          GE,
+    "return",      RETURN,
     NULL,          0          // 0 to mark the end of the table
 } ;
 
@@ -429,7 +534,7 @@ int yylex ()
     int i ;
     unsigned char c ;
     unsigned char cc ;
-    char expandable_ops [] =  "!<=>|%&/+-*^" ;
+    char expandable_ops [] =  "<=>|%&/+-*^" ;
     char temp_str [256] ;
     t_keyword *symbol ;
 
@@ -504,6 +609,16 @@ int yylex ()
         }
     }
 
+    if (c == '!') {
+    cc = getchar();
+    if (cc == '=') {
+        yylval.code = gen_code("!=");
+        return NE;
+    }
+    ungetc(cc, stdin);
+    return NOT;
+    }
+
     if (strchr (expandable_ops, c) != NULL) { // // look for c in expandable_ops
         cc = getchar () ;
         sprintf (temp_str, "%c%c", (char) c, (char) cc) ;
@@ -533,31 +648,37 @@ void clear_local_vars()
     local_vars = NULL;
 }
 
-char *add_local_var(char *name)
+void add_scoped_var(char *original, char *translated)
 {
     t_localvar *p = (t_localvar *) my_malloc(sizeof(t_localvar));
-    p->name = gen_code(name);
+    p->original = gen_code(original);
+    p->translated = gen_code(translated);
     p->next = local_vars;
     local_vars = p;
-    return p->name;
 }
 
-int is_local_var(char *name)
+void add_local_var(char *name)
 {
-    t_localvar *p = local_vars;
-    while (p != NULL) {
-        if (strcmp(p->name, name) == 0) return 1;
-        p = p->next;
-    }
-    return 0;
+    sprintf(temp, "%s_%s", current_function, name);
+    add_scoped_var(name, temp);
+}
+
+void add_param_var(char *name)
+{
+    add_scoped_var(name, name);
 }
 
 char *translated_name(char *name)
 {
-    if (is_local_var(name)) {
-        sprintf(temp, "%s_%s", current_function, name);
-        return gen_code(temp);
+    t_localvar *p = local_vars;
+
+    while (p != NULL) {
+        if (strcmp(p->original, name) == 0) {
+            return gen_code(p->translated);
+        }
+        p = p->next;
     }
+
     return gen_code(name);
 }
 

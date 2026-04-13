@@ -78,7 +78,8 @@ extern int yydebug;
     NE = 279,                      /* NE  */
     LE = 280,                      /* LE  */
     GE = 281,                      /* GE  */
-    UNARY_SIGN = 282               /* UNARY_SIGN  */
+    RETURN = 282,                  /* RETURN  */
+    UNARY_SIGN = 283               /* UNARY_SIGN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
