@@ -99,7 +99,7 @@ typedef struct s_attr {
 axiom:
       global_decls defs_before_main
       {
-          printf("%s%s(main)\n", $1.code, $2.code);
+          printf("%s%s", $1.code, $2.code);
       }
     ;
 
@@ -346,7 +346,7 @@ sentence:
       }
     | PUTS '(' STRING ')'
       {
-          sprintf(temp, "(princ \"%s\")", $3.code);
+          sprintf(temp, "(print \"%s\")", $3.code);
           $$.code = gen_code(temp);
       }
     | expression
@@ -556,19 +556,19 @@ char *gen_code (char *name)   // copy the argument to an
 int yylex ()
 {
     int i ;
-    unsigned char c ;
-    unsigned char cc ;
+    int c ;
+    int cc ;
     char expandable_ops [] =  "<=>|%&/+-*^" ;
     char temp_str [256] ;
     t_keyword *symbol ;
 
     do { 
         c = getchar () ; 
-        if (c == '#') { // Ignore the lines starting with # (#define, #include) 
-            do { // WARNING that it may malfunction if a line contains # 
-                c = getchar () ; 
-            } while (c != '\n') ; 
-        } 
+        if (c == '#') { // Ignore the lines starting with # (#define, #include)
+            do {
+                c = getchar();
+            } while (c != '\n' && c != EOF);
+        }
         if (c == '/') { // character / can be the beginning of a comment. 
             cc = getchar () ; 
             if (cc != '/') { // If the following char is / is a comment, but.... 
@@ -576,12 +576,13 @@ int yylex ()
             } else { 
                 c = getchar () ; // ... 
                 if (c == '@') { // Lines starting with //@ are transcribed
-                    do { // This is inline code (embedded code in C).
-                        c = getchar () ; 
-                        putchar (c) ; 
-                    } while (c != '\n') ; 
+                    do {
+                        c = getchar();
+                        if (c == EOF) break;
+                        putchar(c);
+                    } while (c != '\n');
                 } else { // ==> comment, ignore the line 
-                    while (c != '\n') { 
+                    while (c != '\n' && c != EOF) { 
                         c = getchar () ; 
                     } 
                 } 
