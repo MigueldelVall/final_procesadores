@@ -1,1 +1,3 @@
-(setq a 1)
+(defun main ()
+  (setq a 1)
+)
