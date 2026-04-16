@@ -71,7 +71,7 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
 
             | '(' SETQ IDENTIF number ')'       { printf (" variable %s %s ! ", $3.code, $3.code) ; }
                                                                                                       
-            | '(' SETF /* */ ')'                { /* */ }    // Using a variable as receiver requires adding the store operator (!) in Forth 
+            | '(' SETF IDENTIF expression ')'   { printf (" %s ! ", $3.code) ; }
 
             | '(' PRINT STRING ')'              { printf (" .\" %s\" ", $3.code) ; }
 
@@ -195,6 +195,7 @@ t_keyword keywords [] = {     // define the keywords
     "main",        MAIN,      // and their associated token  
     "defun",       DEFUN,
     "setq",        SETQ,
+    "setf",        SETF,
     "print",       PRINT,
     "princ",       PRINC,
     "loop",        LOOP,

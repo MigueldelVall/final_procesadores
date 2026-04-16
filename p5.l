@@ -1,0 +1,5 @@
+(defun main ()
+  (setq a 5)
+  (setf a (- a))
+  (princ a)
+)
