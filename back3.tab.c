@@ -1190,7 +1190,7 @@ yyreduce:
 
   case 10: /* expression1: '(' PRINT STRING ')'  */
 #line 76 "back3.y"
-                                                { /* */ }
+                                                { printf (" .\" %s\" ", yyvsp[-1].code) ; }
 #line 1195 "back3.tab.c"
     break;
 
