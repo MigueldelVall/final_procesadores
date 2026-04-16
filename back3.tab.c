@@ -488,7 +488,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  21
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   53
+#define YYLAST   56
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  21
@@ -497,7 +497,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  28
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  59
+#define YYNSTATES  60
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   272
@@ -594,12 +594,12 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       6,   -20,   -20,    27,     2,   -20,   -20,   -20,   -20,   -20,
-     -11,     4,    10,    -4,    11,    13,    -3,     9,     6,     9,
-       6,   -20,     6,   -20,   -20,    17,   -20,     7,    12,   -20,
-       8,   -20,    23,     3,    26,   -20,   -20,     9,    29,    30,
-     -20,   -20,   -20,    31,   -20,     6,   -20,   -20,   -20,   -20,
-      32,    20,     6,   -20,     6,    33,    34,   -20,   -20
+       6,   -20,   -20,    28,    13,   -20,   -20,   -20,   -20,   -20,
+     -11,     7,    11,    -3,    12,    15,     8,     8,     6,     8,
+       6,   -20,     6,   -20,   -20,    14,   -20,    10,    24,     5,
+      27,   -20,    30,     3,    31,   -20,   -20,     8,    32,    33,
+     -20,   -20,   -20,   -20,    34,   -20,     6,   -20,   -20,   -20,
+     -20,    35,    20,     6,   -20,     6,    36,    37,   -20,   -20
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -609,23 +609,23 @@ static const yytype_int8 yydefact[] =
 {
        0,    28,    26,     0,     0,     2,     3,     7,    23,    27,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     1,     6,    13,    16,     0,     9,     0,     0,    11,
+       0,     1,     6,    13,    16,     0,     9,     0,     0,     0,
        0,    22,     0,     0,    20,     5,     4,     0,     0,     0,
-      10,    12,    25,     0,    19,     0,    17,     8,    14,    24,
-       0,     0,     0,    21,     0,     0,     0,    15,    18
+      10,    11,    12,    25,     0,    19,     0,    17,     8,    14,
+      24,     0,     0,     0,    21,     0,     0,     0,    15,    18
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
      -20,   -20,   -18,   -20,   -20,   -19,   -20,   -20,   -20,   -20,
-     -20,   -14,   -20,     5
+     -20,   -14,   -20,    22
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     4,     5,    22,    36,     6,    52,    37,    51,    45,
+       0,     4,     5,    22,    36,     6,    53,    37,    52,    46,
       20,     7,     8,     9
 };
 
@@ -634,22 +634,22 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      32,    34,    21,    31,    35,    33,     1,     2,    23,     1,
-       2,    24,     1,     2,    25,    26,    29,    27,    28,    43,
-       1,    30,    42,    46,     3,    39,    50,    30,    19,    54,
-      38,    40,     0,    10,    55,    11,    56,    12,    13,    14,
-      15,    16,    41,    17,    18,    44,     0,    19,    47,    48,
-      49,    53,    57,    58
+      32,    34,    30,    31,    35,    33,     1,     2,    23,     1,
+       2,     1,     2,    21,    24,    25,    26,     1,    27,    44,
+      28,    29,    43,    47,     3,    19,    29,    51,    39,    55,
+       0,     0,     0,     0,    10,    56,    11,    57,    12,    13,
+      14,    15,    16,    40,    17,    18,    41,    38,    19,    42,
+      45,    48,    49,    50,    54,    58,    59
 };
 
 static const yytype_int8 yycheck[] =
 {
-      18,    20,     0,    17,    22,    19,     3,     4,    19,     3,
-       4,     7,     3,     4,     4,    19,    19,     6,     5,    33,
-       3,    18,    19,    37,    18,    18,    45,    18,    20,     9,
-      25,    19,    -1,     6,    52,     8,    54,    10,    11,    12,
-      13,    14,    19,    16,    17,    19,    -1,    20,    19,    19,
-      19,    19,    19,    19
+      18,    20,    16,    17,    22,    19,     3,     4,    19,     3,
+       4,     3,     4,     0,     7,     4,    19,     3,     6,    33,
+       5,    18,    19,    37,    18,    20,    18,    46,    18,     9,
+      -1,    -1,    -1,    -1,     6,    53,     8,    55,    10,    11,
+      12,    13,    14,    19,    16,    17,    19,    25,    20,    19,
+      19,    19,    19,    19,    19,    19,    19
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -658,10 +658,10 @@ static const yytype_int8 yystos[] =
 {
        0,     3,     4,    18,    22,    23,    26,    32,    33,    34,
        6,     8,    10,    11,    12,    13,    14,    16,    17,    20,
-      31,     0,    24,    19,     7,     4,    19,     6,     5,    19,
-      18,    32,    23,    32,    26,    23,    25,    28,    34,    18,
-      19,    19,    19,    32,    19,    30,    32,    19,    19,    19,
-      26,    29,    27,    19,     9,    23,    23,    19,    19
+      31,     0,    24,    19,     7,     4,    19,     6,     5,    18,
+      32,    32,    23,    32,    26,    23,    25,    28,    34,    18,
+      19,    19,    19,    19,    32,    19,    30,    32,    19,    19,
+      19,    26,    29,    27,    19,     9,    23,    23,    19,    19
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
@@ -676,7 +676,7 @@ static const yytype_int8 yyr1[] =
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     0,     3,     1,     0,     1,     5,     3,
-       4,     3,     4,     3,     0,     8,     0,     0,     9,     4,
+       4,     4,     4,     3,     0,     8,     0,     0,     9,     4,
        0,     6,     2,     1,     5,     4,     1,     1,     1
 };
 
@@ -1194,9 +1194,9 @@ yyreduce:
 #line 1195 "back3.tab.c"
     break;
 
-  case 11: /* expression1: '(' PRINC ')'  */
+  case 11: /* expression1: '(' PRINC expression ')'  */
 #line 78 "back3.y"
-                                                { /* */ }
+                                                { printf (" . ") ; }
 #line 1201 "back3.tab.c"
     break;
 
