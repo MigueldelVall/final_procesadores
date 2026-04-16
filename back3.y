@@ -69,7 +69,7 @@ r_exprSeq:    exprSeq                           { ; }
 expression1:  expression                        { ; }  // Lisp can evaluate arithmetical (and similar) expressions in REPL mode
                                                        // REPL Mode should print out the evaluated expressions ==> Future TODO for the Forth translation
 
-            | '(' SETQ IDENTIF number ')'       { /* */ }  // This is the declaration of a variable which in Forth has to be of global scope
+            | '(' SETQ IDENTIF number ')'       { printf (" variable %s %s ! ", $3.code, $3.code) ; }
                                                                                                       
             | '(' SETF /* */ ')'                { /* */ }    // Using a variable as receiver requires adding the store operator (!) in Forth 
 
@@ -134,7 +134,7 @@ void yyerror (char *message)
 
 char *int_to_string (int n)
 {
-    char temp [1024] :
+    char temp [1024] ;
 
     sprintf (temp, "%d", n) ;
 
@@ -143,7 +143,7 @@ char *int_to_string (int n)
 
 char *char_to_string (char c)
 {
-    char temp [1024] :
+    char temp [1024] ;
 
     sprintf (temp, "%c", c) ;
 
@@ -194,6 +194,7 @@ typedef struct s_keyword { // for the reserved words of C
 t_keyword keywords [] = {     // define the keywords 
     "main",        MAIN,      // and their associated token  
     "defun",       DEFUN,
+    "setq",        SETQ,
     "print",       PRINT,
     "princ",       PRINC,
     "loop",        LOOP,
@@ -245,26 +246,24 @@ int yylex ()
                 c = getchar () ; 
             } while (c != '\n') ; 
         } 
-        if (c == '/') { // character / can be the beginning of a comment. 
-            cc = getchar () ; 
-            if (cc != '/') { // If the following char is / is a comment, but.... 
-                ungetc (cc, stdin) ; 
-            } else { 
-                c = getchar () ; // ... 
+        if (c == '/') { // character / can be the beginning of a comment.
+            cc = getchar();
+            if (cc != '/') {
+                ungetc(cc, stdin);
+            } else {
+                c = getchar();
                 if (c == '@') { // Lines starting with //@ are transcribed
-                    do { // This is inline code (embedded code in C).
-                        c = getchar () ; 
-                        putchar (c) ; 
-                    } while (c != '\n' && c != EOF) ;
-                    if (c == EOF) {
-                        ungetc (c, stdin) ; 
-                } else { // ==> comment, ignore the line 
-                    while (c != '\n') { 
-                        c = getchar () ; 
-                    } 
-                } 
-            } 
-        } 
+                    do {
+                        c = getchar();
+                        if (c != EOF) putchar(c);
+                    } while (c != '\n' && c != EOF);
+                } else { // ==> comment, ignore the line
+                    while (c != '\n' && c != EOF) {
+                        c = getchar();
+                    }
+                }
+            }
+        }
         if (c == '\n') 
             n_line++ ; 
     } while (c == ' ' || c == '\n' || c == 10 || c == 13 || c == '\t') ;
