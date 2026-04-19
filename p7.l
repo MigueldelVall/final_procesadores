@@ -1,0 +1,5 @@
+(defun main ()
+  (if (< a 3)
+    (princ a)
+    (princ 0))
+)

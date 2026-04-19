@@ -1,3 +1,9 @@
+/*
+     Miguel del Valle Gassó, Mateo Nonzioli,717
+100496753@alumnos.uc3m.es,100523033@alumnos.uc3m.es
+*/
+
+
 %{                          // SECTION 1 Declarations for C-Bison
 #include <stdio.h>
 #include <ctype.h>            // tolower()
@@ -46,6 +52,10 @@ typedef struct s_attr {
 %token AND
 %token IF 
 %token PROGN
+%token MOD
+%token OR
+%token NOT
+%token NE LE GE
 
 
 // %prec section not needed in LISP
@@ -87,9 +97,9 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
 // In real Lisp some expressions like if or Loop-While-Do are only permitted inside defun definitions (level 2 expressions) ==> Future ToDo
 // Level 1 and common expressions (arithmetic etc.) are also permitted inside a defun definition
 
-            | '(' LOOP WHILE                    { /* */  }  
-                 expression                     {  /* */ } 
-                 DO exprSeq ')'                 {  /* */ }
+            | '(' LOOP WHILE                    { printf ("begin") ; }  
+                 expression                     { printf ("while") ; } 
+                 DO exprSeq ')'                 { printf ("repeat") ; }
 
             | '(' ifHead  expression1 ')'       { printf (" THEN\n") ; }     // If Expression then Expression1
                                                                              // ifHead is used to avoid conflicts through partial factorization
@@ -106,9 +116,19 @@ ifHead:       IF expression                     { printf (" IF ") ; }        // 
 expression:   operand                                   { ; }                // Common expressions combine arithmetic, relational and boolean expressions, including base operands.
 
             | '(' '-' expression expression ')'         { printf (" - ") ; } 
-
-/* - * / MOD AND OR > < GE LE ... NOT */
-
+            | '(' '+' expression expression ')'         { printf (" + ") ; } 
+            | '(' '*' expression expression ')'         { printf (" * ") ; } 
+            | '(' '/' expression expression ')'         { printf (" / ") ; } 
+            | '(' MOD expression expression ')'         { printf (" mod ") ; } 
+            | '(' AND expression expression ')'         { printf (" and ") ; } 
+            | '(' OR expression expression ')'          { printf (" or ") ; } 
+            | '(' NOT expression ')'         { printf (" 0= ") ; }
+            | '(' '=' expression expression ')'          { printf (" = ") ; } 
+            | '(' NE expression expression ')'          { printf (" = 0= ") ; } 
+            | '(' '<' expression expression ')'         { printf (" < ") ; } 
+            | '(' '>' expression expression ')'         { printf (" > ") ; } 
+            | '(' LE expression expression ')'          { printf (" <= ") ; } 
+            | '(' GE expression expression ')'          { printf (" >= ") ; } 
             | '(' '-' expression ')'                    { printf (" negate ") ; } // Unary minus operator in Lisp
             ;
 
@@ -204,6 +224,12 @@ t_keyword keywords [] = {     // define the keywords
     "and",         AND,
     "if",          IF,
     "progn",       PROGN,
+    "mod",         MOD,
+    "or",          OR,
+    "not",         NOT,
+    "/=",          NE,
+    "<=",          LE,
+    ">=",          GE,
     NULL,          0          // 0 to mark the end of the table
 } ;
 
