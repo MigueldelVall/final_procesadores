@@ -99,25 +99,28 @@ typedef struct s_attr {
 axiom:
       global_decls defs_before_main
       {
-          printf("%s%s", $1.code, $2.code);
+         ;
       }
     ;
 
 defs_before_main:
       main_def
       {
-          $$ = $1;
+          $$.code = gen_code("");
       }
     | function_def defs_before_main
       {
-          sprintf(temp, "%s%s", $1.code, $2.code);
-          $$.code = gen_code(temp);
+          $$.code = gen_code("");
       }
     ;
 
-global_decls:                                { $$.code = gen_code(""); }
-            | global_decls declaration ';'   { sprintf(temp, "%s%s\n", $1.code, $2.code);
-                                               $$.code = gen_code(temp); }
+global_decls:
+              { $$.code = gen_code(""); }
+            | global_decls declaration ';'
+              {
+                  printf("%s\n", $2.code);
+                  $$.code = gen_code("");
+              }
             ;
 
 main_def:
@@ -129,7 +132,8 @@ main_def:
       '{' body '}'
       {
           sprintf(temp, "(defun main ()\n%s)\n", $6.code);
-          $$.code = gen_code(temp);
+          printf("%s", temp);
+          $$.code = gen_code("");
           clear_local_vars();
           strcpy(current_function, "");
       }
@@ -144,7 +148,8 @@ function_def:
       '(' param_defs ')' '{' body '}'
       {
           sprintf(temp, "(defun %s (%s)\n%s)\n", $1.code, $4.code, $7.code);
-          $$.code = gen_code(temp);
+          printf("%s", temp);
+          $$.code = gen_code("");
           clear_local_vars();
           strcpy(current_function, "");
       }
@@ -445,8 +450,7 @@ int n_line = 1 ;
 
 void yyerror (char *message)
 {
-    fprintf (stderr, "%s in line %d\n", message, n_line) ;
-    printf ( "\n") ;
+    fprintf(stderr, "%s in line %d\n", message, n_line);
 }
 
 char *int_to_string (int n)
@@ -599,7 +603,7 @@ int yylex ()
             temp_str [i++] = c ;
         } while (c != '\"' && i < 255) ;
         if (i == 256) {
-            printf ("WARNING: string with more than 255 characters in line %d\n", n_line) ; 
+            fprintf(stderr, "WARNING: string with more than 255 characters in line %d\n", n_line);
         } // we should read until the next “, but, what if it is  missing? 
         temp_str [--i] = '\0' ;
         yylval.code = gen_code (temp_str) ;
@@ -659,7 +663,7 @@ int yylex ()
     }
 
 //    printf ("\nDEV: LITERAL %d #%c#\n", (int) c, c) ;      // PARA DEPURAR
-    if (c == EOF || c == 255 || c == 26) {
+    if (c == EOF) {
 //         printf ("tEOF ") ;                                // PARA DEPURAR
         return (0) ;
     }
