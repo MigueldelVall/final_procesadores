@@ -97,84 +97,145 @@ typedef struct s_attr {
 %%
 
 axiom:
-      global_decls defs_before_main     { ; }
+      global_decls defs_before_main
+      {
+         ;
+      }
     ;
 
 defs_before_main:
-      main_def                          { $$.code = gen_code("") ; }
-    | function_def defs_before_main     { $$.code = gen_code("") ; }
+      main_def
+      {
+          $$.code = gen_code("");
+      }
+    | function_def defs_before_main
+      {
+          $$.code = gen_code("");
+      }
     ;
 
-global_decls:                                   { $$.code = gen_code(""); }
-            | global_decls declaration ';'      { printf("%s\n", $2.code) ;
-                                                  $$.code = gen_code("") ; }
+global_decls:
+              { $$.code = gen_code(""); }
+            | global_decls declaration ';'
+              {
+                  printf("%s\n", $2.code);
+                  $$.code = gen_code("");
+              }
             ;
 
 main_def:
-      MAIN '(' ')'                      { strcpy(current_function, "main") ;
-                                          clear_local_vars() ; }
-      '{' body '}'                      { sprintf(temp, "(defun main ()\n%s)\n", $6.code) ;
-                                          printf("%s", temp) ;
-                                          $$.code = gen_code("") ;
-                                          clear_local_vars() ;
-                                          strcpy(current_function, "") ; }
+      MAIN '(' ')' 
+      {
+          strcpy(current_function, "main");
+          clear_local_vars();
+      }
+      '{' body '}'
+      {
+          sprintf(temp, "(defun main ()\n%s)\n", $6.code);
+          printf("%s", temp);
+          $$.code = gen_code("");
+          clear_local_vars();
+          strcpy(current_function, "");
+      }
     ;
 
 function_def:
-      IDENTIF                           { strcpy(current_function, $1.code) ;
-                                          clear_local_vars() ; }
-      '(' param_defs ')' '{' body '}'   { sprintf(temp, "(defun %s (%s)\n%s)\n", $1.code, $4.code, $7.code) ;
-                                          printf("%s", temp) ;
-                                          $$.code = gen_code("") ;
-                                          clear_local_vars() ;
-                                          strcpy(current_function, "") ; }
+      IDENTIF
+      {
+          strcpy(current_function, $1.code);
+          clear_local_vars();
+      }
+      '(' param_defs ')' '{' body '}'
+      {
+          sprintf(temp, "(defun %s (%s)\n%s)\n", $1.code, $4.code, $7.code);
+          printf("%s", temp);
+          $$.code = gen_code("");
+          clear_local_vars();
+          strcpy(current_function, "");
+      }
     ;
 
-param_defs:                             { $$.code = gen_code("") ; }
-    | param_list                        { $$ = $1 ; }
+param_defs:
+      {
+          $$.code = gen_code("");
+      }
+    | param_list
+      {
+          $$ = $1;
+      }
     ;
 
 param_list:
-      INTEGER IDENTIF                   { add_param_var($2.code) ;
-                                          $$.code = gen_code($2.code) ; }
-    | param_list ',' INTEGER IDENTIF    { add_param_var($4.code) ;
-                                          sprintf(temp, "%s %s", $1.code, $4.code) ;
-                                          $$.code = gen_code(temp) ; }
+      INTEGER IDENTIF
+      {
+          add_param_var($2.code);
+          $$.code = gen_code($2.code);
+      }
+    | param_list ',' INTEGER IDENTIF
+      {
+          add_param_var($4.code);
+          sprintf(temp, "%s %s", $1.code, $4.code);
+          $$.code = gen_code(temp);
+      }
     ;
 
-call_args:                              { $$.code = gen_code("") ; }
-    | call_arg_list                     { $$ = $1 ; }
+call_args:
+      {
+          $$.code = gen_code("");
+      }
+    | call_arg_list
+      {
+          $$ = $1;
+      }
     ;
 
 call_arg_list:
-      expression                        { $$ = $1 ; }
-    | call_arg_list ',' expression      { sprintf(temp, "%s %s", $1.code, $3.code) ; 
-                                          $$.code = gen_code(temp) ; }
+      expression
+      {
+          $$ = $1;
+      }
+    | call_arg_list ',' expression
+      {
+          sprintf(temp, "%s %s", $1.code, $3.code);
+          $$.code = gen_code(temp);
+      }
     ;
 
 body:
-      body_element                      { sprintf(temp, " %s\n", $1.code);
-                                          $$.code = gen_code(temp) ; }
-    | body body_element                 { sprintf(temp, "%s %s\n", $1.code, $2.code) ;
-                                          $$.code = gen_code(temp) ; }
+      body_element
+      {
+          sprintf(temp, " %s\n", $1.code);
+          $$.code = gen_code(temp);
+      }
+    | body body_element
+      {
+          sprintf(temp, "%s %s\n", $1.code, $2.code);
+          $$.code = gen_code(temp);
+      }
     ;
 
 body_element:
-      statement                         { $$.code = $1.code ; }
-    | declaration ';'                   { $$.code = $1.code ; }
+      statement
+      {
+          $$.code = $1.code;
+      }
+    | declaration ';'
+      {
+          $$.code = $1.code;
+      }
     ;
 
 statement:  sentence ';'                { sprintf(temp, "%s", $1.code);
-                                          $$.code = gen_code(temp) ; }
+                                          $$.code = gen_code(temp); }
             | control_struct            { sprintf(temp, "%s", $1.code);
-                                          $$.code = gen_code(temp) ; }
+                                          $$.code = gen_code(temp); }
             ;
 
 control_struct: WHILE '(' expression ')' '{' body '}'                             { sprintf (temp, "(loop while %s do %s)", $3.code, $6.code) ;  
                                                                                     $$.code = gen_code (temp) ; }
-                | IF '(' expression ')' '{' body '}'                              { sprintf (temp, "(if %s (progn %s))", $3.code, $6.code) ;
+                | IF '(' expression ')' '{' body '}'                              { sprintf (temp, "(if %s (progn %s))", $3.code, $6.code) ;  //!ASK ABOUT PROGN!
                                                                                     $$.code = gen_code (temp) ; }
-                | IF '(' expression ')' '{' body '}' ELSE '{' body '}'            { sprintf (temp, "(if %s (progn %s) (progn %s))", $3.code, $6.code, $10.code) ;
+                | IF '(' expression ')' '{' body '}' ELSE '{' body '}'            { sprintf (temp, "(if %s (progn %s) (progn %s))", $3.code, $6.code, $10.code) ;  //!ASK ABOUT PROGN!
                                                                                     $$.code = gen_code (temp) ; } 
                 | FOR '(' for_init ';' expression ';' for_update ')' '{' body '}' { sprintf (temp, "(progn %s (loop while %s do (progn %s %s)))", $3.code, $5.code, $10.code, $7.code) ;
                                                                                     $$.code = gen_code (temp) ; } 
@@ -182,93 +243,132 @@ control_struct: WHILE '(' expression ')' '{' body '}'                           
                                                                                     $$.code = gen_code (temp) ; }
             ;
 
-case_list:  case_list case_block        { sprintf(temp, "%s %s", $1.code, $2.code) ;
-                                          $$.code = gen_code(temp) ; }
-            | case_block                { $$.code = $1.code ; }
+case_list:  case_list case_block            { sprintf(temp, "%s %s", $1.code, $2.code);
+                                              $$.code = gen_code(temp) ; }
+            | case_block                    { $$.code = $1.code ; }
             ;
 
-case_block:  CASE NUMBER ':' body BREAK ';'     { sprintf(temp, "(%d (progn %s))", $2.value, $4.code) ;
+case_block:  CASE NUMBER ':' body BREAK ';'     { sprintf(temp, "(%d (progn %s))", $2.value, $4.code);
                                                   $$.code = gen_code(temp) ; }
-            | DEFAULT ':' body BREAK ';'        { sprintf(temp, "(otherwise (progn %s))", $3.code) ;
+            | DEFAULT ':' body BREAK ';'        { sprintf(temp, "(otherwise (progn %s))", $3.code);
                                                   $$.code = gen_code(temp) ; }
             ;
 
 for_init:
-      IDENTIF '=' expression            { char *name = translated_name($1.code) ;
-                                          sprintf(temp, "(setf %s %s)", name, $3.code) ;
-                                          $$.code = gen_code(temp) ; }
+      IDENTIF '=' expression
+      {
+          char *name = translated_name($1.code);
+          sprintf(temp, "(setf %s %s)", name, $3.code);
+          $$.code = gen_code(temp);
+      }
     ;
 
 for_update:
-      INC '(' IDENTIF ')'               { char *name = translated_name($3.code) ;
-                                          sprintf(temp, "(setf %s (+ %s 1))", name, name) ;
-                                          $$.code = gen_code(temp) ; }
-    | DEC '(' IDENTIF ')'               { char *name = translated_name($3.code) ;
-                                          sprintf(temp, "(setf %s (- %s 1))", name, name) ;
-                                          $$.code = gen_code(temp) ; }
+      INC '(' IDENTIF ')'
+      {
+          char *name = translated_name($3.code);
+          sprintf(temp, "(setf %s (+ %s 1))", name, name);
+          $$.code = gen_code(temp);
+      }
+    | DEC '(' IDENTIF ')'
+      {
+          char *name = translated_name($3.code);
+          sprintf(temp, "(setf %s (- %s 1))", name, name);
+          $$.code = gen_code(temp);
+      }
     ;
 
-declaration:  INTEGER decl_list         { $$ = $2 ; }
+declaration:  INTEGER decl_list              { $$ = $2 ; }
             ;
 
-decl_list:    decl_item                 { $$ = $1 ; }
-            | decl_list ',' decl_item   { sprintf (temp, "%s\n%s", $1.code, $3.code) ;
-                                          $$.code = gen_code (temp) ; }
+decl_list:    decl_item                      { $$ = $1 ; }
+            | decl_list ',' decl_item        { sprintf (temp, "%s\n%s", $1.code, $3.code) ;
+                                               $$.code = gen_code (temp) ; }
             ;
 
 decl_item:
-      IDENTIF                           { char *name ;
-                                          if (strlen(current_function) > 0) {
-                                            add_local_var($1.code) ;
-                                            name = translated_name($1.code) ;
-                                          } else {
-                                            name = gen_code($1.code) ;
-                                          }
-                                          sprintf(temp, "(setq %s 0)", name) ;
-                                          $$.code = gen_code(temp) ; }
-    | IDENTIF '=' NUMBER                { char *name ;
-                                          if (strlen(current_function) > 0) {
-                                            add_local_var($1.code) ;
-                                            name = translated_name($1.code) ;
-                                          } else {
-                                            name = gen_code($1.code) ;
-                                          }
-                                          sprintf(temp, "(setq %s %d)", name, $3.value) ;
-                                          $$.code = gen_code(temp) ; }
-    | IDENTIF '[' NUMBER ']'            { char *name ;
-                                          if (strlen(current_function) > 0) {
-                                            add_local_var($1.code) ;
-                                            name = translated_name($1.code) ;
-                                          } else {
-                                            name = gen_code($1.code) ;
-                                          }
-                                          sprintf(temp, "(setq %s (make-array %d))", name, $3.value) ;
-                                          $$.code = gen_code(temp) ; }
+      IDENTIF
+      {
+          char *name;
+          if (strlen(current_function) > 0) {
+              add_local_var($1.code);
+              name = translated_name($1.code);
+          } else {
+              name = gen_code($1.code);
+          }
+
+          sprintf(temp, "(setq %s 0)", name);
+          $$.code = gen_code(temp);
+      }
+    | IDENTIF '=' NUMBER
+      {
+          char *name;
+          if (strlen(current_function) > 0) {
+              add_local_var($1.code);
+              name = translated_name($1.code);
+          } else {
+              name = gen_code($1.code);
+          }
+
+          sprintf(temp, "(setq %s %d)", name, $3.value);
+          $$.code = gen_code(temp);
+      }
+    | IDENTIF '[' NUMBER ']'
+      {
+          char *name;
+          if (strlen(current_function) > 0) {
+              add_local_var($1.code);
+              name = translated_name($1.code);
+          } else {
+              name = gen_code($1.code);
+          }
+
+          sprintf(temp, "(setq %s (make-array %d))", name, $3.value);
+          $$.code = gen_code(temp);
+      }
     ;
 sentence:
-    IDENTIF '=' expression                          { char *name = translated_name($1.code) ;
-                                                      sprintf(temp, "(setf %s %s)", name, $3.code) ;
-                                                      $$.code = gen_code(temp) ; }
-    | IDENTIF '[' expression ']' '=' expression     { char *name = translated_name($1.code) ;
-                                                      sprintf(temp, "(setf (aref %s %s) %s)", name, $3.code, $6.code) ;
-                                                      $$.code = gen_code(temp) ; }
-    | RETURN expression                             { sprintf(temp, "(return-from %s %s)", current_function, $2.code) ;
-                                                      $$.code = gen_code(temp) ; }
-    | PRINTF '(' STRING ',' arg_list ')'            { $$.code = $5.code ; }
-    | PUTS '(' STRING ')'                           { sprintf(temp, "(print \"%s\")", $3.code) ;
-                                                      $$.code = gen_code(temp) ; }
-    | expression                                    { $$ = $1 ; }
+      IDENTIF '=' expression
+      {
+          char *name = translated_name($1.code);
+          sprintf(temp, "(setf %s %s)", name, $3.code);
+          $$.code = gen_code(temp);
+      }
+    | IDENTIF '[' expression ']' '=' expression
+      {
+          char *name = translated_name($1.code);
+          sprintf(temp, "(setf (aref %s %s) %s)", name, $3.code, $6.code);
+          $$.code = gen_code(temp);
+      }
+    | RETURN expression
+      {
+          sprintf(temp, "(return-from %s %s)", current_function, $2.code);
+          $$.code = gen_code(temp);
+      }
+    | PRINTF '(' STRING ',' arg_list ')'
+      {
+          $$.code = $5.code;
+      }
+    | PUTS '(' STRING ')'
+      {
+          sprintf(temp, "(print \"%s\")", $3.code);
+          $$.code = gen_code(temp);
+      }
+    | expression
+      {
+          $$ = $1;
+      }
     ;
           
-arg_list:   arg                         { sprintf (temp, "(princ %s)", $1.code) ; 
-                                          $$.code = gen_code (temp) ; }
-            | arg_list ',' arg          { sprintf (temp, "%s\n(princ %s)", $1.code, $3.code) ; 
-                                          $$.code = gen_code (temp) ; }
+arg_list:   arg                             {sprintf (temp, "(princ %s)", $1.code) ; 
+                                               $$.code = gen_code (temp) ;}
+            | arg_list ',' arg              {sprintf (temp, "%s\n(princ %s)", $1.code, $3.code) ; 
+                                               $$.code = gen_code (temp) ;}
             ;
 
-arg:        expression                  { $$ = $1 ; }
-            | STRING                    { sprintf (temp, "\"%s\"", $1.code) ; 
-                                          $$.code = gen_code (temp) ; }
+arg:        expression                      {$$ = $1 ; }
+            | STRING                        {sprintf (temp, "\"%s\"", $1.code) ; 
+                                               $$.code = gen_code (temp) ;}
             ;
 
 expression:   term                           { $$ = $1 ; }
@@ -311,20 +411,36 @@ term:         operand                        { $$ = $1 ; }
             ;
 
 operand:
-      IDENTIF '(' call_args ')'         { if (strlen($3.code) == 0)
-                                            sprintf(temp, "(%s)", $1.code) ;
-                                          else
-                                            sprintf(temp, "(%s %s)", $1.code, $3.code) ;
-                                          $$.code = gen_code(temp) ; }
-    | IDENTIF '[' expression ']'        { char *name = translated_name($1.code) ;
-                                          sprintf(temp, "(aref %s %s)", name, $3.code) ;
-                                          $$.code = gen_code(temp) ; }
-    | IDENTIF                           { char *name = translated_name($1.code) ;
-                                          sprintf(temp, "%s", name) ;
-                                          $$.code = gen_code(temp) ; }
-    | NUMBER                            { sprintf(temp, "%d", $1.value) ;
-                                          $$.code = gen_code(temp) ; }
-    | '(' expression ')'                { $$ = $2 ; }
+      IDENTIF '(' call_args ')'
+      {
+          if (strlen($3.code) == 0)
+              sprintf(temp, "(%s)", $1.code);
+          else
+              sprintf(temp, "(%s %s)", $1.code, $3.code);
+
+          $$.code = gen_code(temp);
+      }
+    | IDENTIF '[' expression ']'
+      {
+          char *name = translated_name($1.code);
+          sprintf(temp, "(aref %s %s)", name, $3.code);
+          $$.code = gen_code(temp);
+      }
+    | IDENTIF
+      {
+          char *name = translated_name($1.code);
+          sprintf(temp, "%s", name);
+          $$.code = gen_code(temp);
+      }
+    | NUMBER
+      {
+          sprintf(temp, "%d", $1.value);
+          $$.code = gen_code(temp);
+      }
+    | '(' expression ')'
+      {
+          $$ = $2;
+      }
     ;
 
 
