@@ -1,0 +1,25 @@
+int a;
+int b;
+
+main() {
+    a = 10;
+    b = 3;
+
+    a = a + b;
+    a = a - b;
+    a = a * b;
+    a = a / b;
+    a = a % b;
+    a = a ^ b;
+
+    a = a && b;
+    a = a || b;
+    a = !a;
+
+    a = a == b;
+    a = a != b;
+    a = a <= b;
+    a = a >= b;
+    a = a < b;
+    a = a > b;
+}

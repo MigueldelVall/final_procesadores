@@ -1,0 +1,12 @@
+(setq i 1)
+(setq sum 0)
+
+(defun main ()
+    (loop while (< i 5) do
+        (setf sum (+ sum i))
+        (setf i (+ i 1))
+    )
+    (princ sum)
+)
+
+(main)

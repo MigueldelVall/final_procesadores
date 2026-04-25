@@ -1,0 +1,51 @@
+(setq a 10)
+(setq b 3)
+(setq c 0)
+
+(defun main ()
+
+    (princ (+ a b))
+    (princ " ")
+    (princ (- a b))
+    (princ " ")
+    (princ (* a b))
+    (princ " ")
+    (princ (/ a b))
+    (princ " ")
+    (princ (mod a b))
+    (princ " ")
+
+    (princ (+ (* a b) (/ a b)))
+    (princ " ")
+
+    (if (> a b)
+        (princ "GT ")
+    )
+
+    (if (< b a)
+        (princ "LT ")
+    )
+
+    (if (= c 0)
+        (princ "ZERO ")
+    )
+
+    (if (/= a b)
+        (princ "DIFF ")
+    )
+
+    (if (and (> a b) (< b a))
+        (princ "AND_OK ")
+    )
+
+    (if (or (= a 0) (= c 0))
+        (princ "OR_OK ")
+    )
+
+    (if (not (= c 1))
+        (princ "NOT_OK ")
+    )
+
+)
+
+(main)

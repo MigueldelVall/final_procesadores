@@ -1,0 +1,11 @@
+(setq a 6)
+(setq b 3)
+
+(defun main ()
+    (princ (+ a b))
+    (princ (* a b))
+    (princ (/ a b))
+    (princ (mod a b))
+)
+
+(main)

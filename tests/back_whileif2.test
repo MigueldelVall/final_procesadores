@@ -1,0 +1,12 @@
+(setq i 1)
+
+(defun main ()
+    (loop while (< i 10) do
+        (if (= (mod i 3) 0)
+            (princ i)
+        )
+        (setf i (+ i 1))
+    )
+)
+
+(main)

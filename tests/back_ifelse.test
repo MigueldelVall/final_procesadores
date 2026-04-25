@@ -1,0 +1,11 @@
+(setq a 10)
+(setq b 20)
+
+(defun main ()
+    (if (> a b)
+        (princ "a bigger")
+        (princ "b bigger")
+    )
+)
+
+(main)

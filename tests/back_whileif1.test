@@ -1,0 +1,13 @@
+(setq i 1)
+
+(defun main ()
+    (loop while (< i 6) do
+        (if (= (mod i 2) 0)
+            (princ "even ")
+            (princ "odd ")
+        )
+        (setf i (+ i 1))
+    )
+)
+
+(main)

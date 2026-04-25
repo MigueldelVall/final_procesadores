@@ -1,0 +1,10 @@
+(setq a 1)
+(setq b 0)
+
+(defun main ()
+    (if (and a (not b))
+        (princ "ok")
+    )
+)
+
+(main)

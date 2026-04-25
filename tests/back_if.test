@@ -1,0 +1,10 @@
+(setq x 5)
+(setq y 2)
+
+(defun main ()
+    (if (> x y)
+        (princ x)
+    )
+)
+
+(main)
