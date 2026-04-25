@@ -85,7 +85,7 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
 
             | '(' PRINT STRING ')'              { printf (" .\" %s\" ", $3.code) ; }
 
-            | '(' PRINC expression ')'          { printf (" . ") ; }
+            | '(' PRINC princ_expr ')'          { ; }
            
             | '(' PROGN exprSeq ')'             { /* */ }
 
@@ -108,6 +108,9 @@ expression1:  expression                        { ; }  // Lisp can evaluate arit
                  expression1 ')'                {  printf (" THEN\n") ; }    // more than one expression per then or else branch are only allowed nesting them within a PROGN expression
             ;
 
+princ_expr: expression                          { printf (" . ") ; }
+            | STRING                            { printf (" .\" %s\" ", $1.code) ; }
+            ;
 
 ifHead:       IF expression                     { printf (" IF ") ; }        // Real Lisp restricts if conditions to Boolean type expressions (excluding base operands?) ==> Future TOOD
             ;
@@ -122,8 +125,8 @@ expression:   operand                                   { ; }                // 
             | '(' MOD expression expression ')'         { printf (" mod ") ; } 
             | '(' AND expression expression ')'         { printf (" and ") ; } 
             | '(' OR expression expression ')'          { printf (" or ") ; } 
-            | '(' NOT expression ')'         { printf (" 0= ") ; }
-            | '(' '=' expression expression ')'          { printf (" = ") ; } 
+            | '(' NOT expression ')'                    { printf (" 0= ") ; }
+            | '(' '=' expression expression ')'         { printf (" = ") ; } 
             | '(' NE expression expression ')'          { printf (" = 0= ") ; } 
             | '(' '<' expression expression ')'         { printf (" < ") ; } 
             | '(' '>' expression expression ')'         { printf (" > ") ; } 
