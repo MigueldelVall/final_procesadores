@@ -1,0 +1,20 @@
+(setq a 5)
+(setq b 2)
+(setq c 0)
+
+(defun main ()
+
+    (setf c (+ (* a b) (- a b)))
+    (princ c)
+    (princ " ")
+
+    (setf a (+ c 1))
+    (princ a)
+    (princ " ")
+
+    (setf b (/ a 2))
+    (princ b)
+
+)
+
+(main)

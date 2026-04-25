@@ -1,0 +1,10 @@
+int a;
+
+main ()
+{
+    int a;
+    a = 9;
+    printf("%d", a);
+}
+
+//@ (main)

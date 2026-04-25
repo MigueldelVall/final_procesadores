@@ -1,0 +1,11 @@
+sum2 (int a, int b)
+{
+    return a + b;
+}
+
+main ()
+{
+    printf("%d", sum2(4, 7));
+}
+
+//@ (main)

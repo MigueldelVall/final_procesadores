@@ -1,0 +1,13 @@
+f (int n)
+{
+    int v[4];
+    v[0] = n;
+    return v[0];
+}
+
+main ()
+{
+    printf("%d", f(8));
+}
+
+//@ (main)

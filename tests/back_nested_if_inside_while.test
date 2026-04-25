@@ -1,0 +1,21 @@
+(setq n 8)
+
+(defun main ()
+
+    (loop while (> n 0) do
+        (if (= (mod n 2) 0)
+            (progn
+                (princ n)
+                (princ " even ")
+            )
+            (progn
+                (princ n)
+                (princ " odd ")
+            )
+        )
+        (setf n (- n 1))
+    )
+
+)
+
+(main)
